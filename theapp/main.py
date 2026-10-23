@@ -1,22 +1,35 @@
 import flet as ft
+from screens.home import home_view
+from screens.map import map_view
+from screens.profile import profile_view
+from screens.stats import stats_view
+from screens.record import record_view
 
 
-def  main(page: ft.Page):
+SCREENS = [home_view, map_view, profile_view, stats_view, record_view]  # same order as the navbar destinations
 
-   Hola = ft.Text("Hola Senor!", size=20, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE)
-   Burger = ft.IconButton(ft.Icons.MENU, 
-                      icon_color=ft.Colors.BLUE,
-                      icon_size=40, 
-                      align=ft.Alignment.TOP_RIGHT, 
-                      highlight_color=ft.Colors.LIGHT_BLUE_50,
-                      )
+def main(page: ft.Page):
+    page.title = "Campus Tracker"
+    page.theme = ft.Theme(color_scheme_seed="teal")
 
-   #def button_clicked()
+    body = ft.Container(content=SCREENS[0](), padding=20, expand=True)
 
-   page.add(Burger, Hola)
+    def on_nav_change(e):
+        body.content = SCREENS[e.control.selected_index]()
+        page.update()
 
+    page.navigation_bar = ft.NavigationBar(
+        destinations=[
+            ft.NavigationBarDestination(icon=ft.Icons.EXPLORE, label="Home"),
+            ft.NavigationBarDestination(icon=ft.Icons.EXPLORE, label="Maps"),
+            ft.NavigationBarDestination(icon=ft.Icons.PERSON_OUTLINE_OUTLINED, label="Profile"),
+            ft.NavigationBarDestination(icon=ft.Icons.QUERY_STATS, label="Stats"),
+            ft.NavigationBarDestination(icon=ft.Icons.ACCESS_TIME, label="Record"),
+            ft.NavigationBarDestination(icon=ft.Icons.EXPLORE, label="Leaderboard"),
+        ],
+        on_change=on_nav_change,
+    )
 
-   
-   
+    page.add(ft.SafeArea(body, expand=True))
 
 ft.run(main)
