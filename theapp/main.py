@@ -36,4 +36,8 @@ def main(page: ft.Page):
 
     page.add(ft.SafeArea(body, expand=True))
 
+
+
+
 ft.run(main)
+

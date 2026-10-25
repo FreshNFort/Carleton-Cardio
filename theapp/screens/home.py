@@ -1,4 +1,6 @@
+
 import flet as ft
+# import .. styles
 
 def stat_card(title: str,value:str) -> ft.Card:
     return ft.Card(
@@ -22,6 +24,7 @@ header = ft.Row(
             content=heading,
             expand = True, 
             alignment=ft.Alignment.TOP_CENTER,
+            # **BOX_STYLE,
         )
     ]
 )
