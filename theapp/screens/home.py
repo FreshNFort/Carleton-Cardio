@@ -1,47 +1,77 @@
 
 import flet as ft
-import styles
+import styles 
 
-def stat_card(title: str,value:str) -> ft.Card:
-    return ft.Card(
-        content=ft.Container(
-            padding=16,
-            content=ft.Column(
-                [
-                    ft.Text(title, size=14),
-                    ft.Text(value,size=24, weight=ft.FontWeight.BOLD)
-                ],
-                spacing=4,
-            ),
-        )
+
+# CREATES A  BOX/CONTAINER OF TEXT. TITLE IS SMALLER, UNBOLDED, VALUE IS THE NUMBERED AMOUNT DISPLAY LARGER AND IN BOLD  
+def stat_box(title: str,value:str) -> ft.Container:
+    return ft.Container(
+        **styles.BOX_STYLE,
+        
+        content=ft.Column(
+            [
+                ft.Text(title, **styles.BOX_TEXT_STYLE,),
+                ft.Text(value, **styles.BOX_TEXT_STYLE, size=24, weight=ft.FontWeight.BOLD, )
+            ],    
+
+        ), 
+          
+
     )
+    
+# HEADING TEXT STYLED FROM STYLES.PY
+heading = ft.Text("Welcome!", **styles.HEADER_TEXT_STYLE,)
 
-heading = ft.Text("Welcome!", size=28, text_align=ft.TextAlign.CENTER, weight = ft.FontWeight.BOLD)
-
+# HEADER ROW CONTAINING TEXT FROM HEADING
 header = ft.Row(
     controls=[
         ft.Container(
             content=heading,
             expand = True, 
             alignment=ft.Alignment.TOP_CENTER,
-            # **BOX_STYLE,
         )
     ]
 )
 
+two_boxes_layout = ft.Row(
+    controls=[
+        stat_box("Distance:","3.2 km",), 
+        stat_box("Time Spent:", "2.5 hrs"),
+    ], 
+)
+
+# MAIN BODY
 body = ft.SafeArea(
-    content=ft.Column(
-        [
-            heading, 
-            stat_card("Distance:","3.2 km"),
-            stat_card("Buildings visited:", "4"),
-        ],
+    content = ft.Row(
+        controls= [
+            # BOXES COLUMN
+            ft.Column(
+            [
+                header,  
+                ft.Text("Daily updates:",), 
+                two_boxes_layout,   
+                
+            ],
+            expand=True, #sets the column to 50% of screen
+
+
+
+            ), 
+            # RIGHT COLUMN
+            ft.Column(
+                ft.Container(
+                    bgcolor="blue", #REDDD
+                    content=ft.Text("Map here ?"),     
+                    expand = True,     
+                    
+                ),
+            expand=True, #sets the column to 50% of screen
+            )
+
+        ], 
         
-        horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
-        scroll=ft.ScrollMode.AUTO,
-        spacing=12,
-        expand=True,
-    ),
+    ), 
+    
 )
 
 def home_view() -> ft.Control:
@@ -49,6 +79,6 @@ def home_view() -> ft.Control:
         [
         body, 
     ],
-    spacing=16, 
+    
     
     )

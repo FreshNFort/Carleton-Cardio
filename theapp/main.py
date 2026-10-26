@@ -13,6 +13,7 @@ SCREENS = [home_view, record_view, map_view, stats_view, leaderboard_view, profi
 def main(page: ft.Page):
     page.title = "Carleton Cardio"
     page.theme = ft.Theme(color_scheme_seed="red")
+    page.bgcolor = "#F5B7BA"
     
 
     body = ft.Container(content=SCREENS[0](), padding=20, expand=True)
@@ -35,6 +36,7 @@ def main(page: ft.Page):
     )
 
     page.add(ft.SafeArea(body, expand=True))
+    page.update()
 
 
 
