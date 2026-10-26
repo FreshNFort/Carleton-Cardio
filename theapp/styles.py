@@ -2,7 +2,7 @@ import flet as ft
 
 # styling for box elements 
 BOX_STYLE = {
-   "bgcolor": "#FFE0E3",
+   "bgcolor": "#7C2932",
     "border_radius": 12,           
     "padding": 15,                 
     # "width": 150,                 
@@ -11,7 +11,7 @@ BOX_STYLE = {
 }
 
 BOX_TEXT_STYLE = {
-    "color": "#64242A",   
+    "color": "#FFE8EA",   
     "text_align": ft.TextAlign.CENTER, 
 
 }
