@@ -24,6 +24,7 @@ def main(page: ft.Page):
     page.window.max_width = 430
     page.window.min_height = 640
     page.window.max_height = 932
+    page.padding = 0
    
 
 
@@ -33,7 +34,7 @@ def main(page: ft.Page):
     page.bgcolor = "#F5C3C5"
     
 
-    body = ft.Container(content=SCREENS[0](), padding=20)
+    body = ft.Container(content=SCREENS[0](), padding=ft.Padding.symmetric(horizontal=20),)
 
     def on_nav_change(e):
         body.content = SCREENS[e.control.selected_index]()
@@ -51,13 +52,14 @@ def main(page: ft.Page):
 
         ],
         on_change=on_nav_change,
+        
         bgcolor=styles.NAV_BG_COLOR,
         indicator_color=styles.NAV_INDICATOR_COLOR,
         
 
     )
 
-    page.add(ft.SafeArea(body))
+    page.add(ft.SafeArea(body, expand=True,))
     page.update()
 
 
