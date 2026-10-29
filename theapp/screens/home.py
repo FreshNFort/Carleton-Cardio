@@ -8,7 +8,7 @@ def stat_box(title: str,value:str) -> ft.Container:
     return ft.Container(
         col={"xs": 6, "md": 3},
         **styles.BOX_STYLE,
-        height = 100,
+        height = 105,
 
         gradient=styles.CARD_GRADIENT1,
         shadow=styles.CARD_SHADOW,
@@ -38,7 +38,6 @@ header = ft.Row(
 two_boxes_layout = ft.ResponsiveRow(
     spacing=10,  
     run_spacing=10,
-    
     controls=[
         stat_box("Distance:", "3.2 km"),
         stat_box("Time Spent:", "2.5 hrs"),
@@ -46,25 +45,44 @@ two_boxes_layout = ft.ResponsiveRow(
     ],
 )
 
+
+leaderboard_button = ft.Button(
+    style = styles.LEADERBOARD_BUTTON,
+        content=ft.Row(
+        alignment=ft.MainAxisAlignment.CENTER,
+        controls=[
+            ft.Text("View Leaderboard", size=14),
+            ft.Icon(ft.Icons.LEADERBOARD_ROUNDED, color="#FFE8EA",),
+        ],
+    )
+
+)
 leaderboard_box = ft.Container(
         col={"xs": 12, "md": 12},
         **styles.BOX_STYLE,
-        height = 130,
-        
+        height = 200,
         gradient=styles.CARD_GRADIENT2,
         shadow=styles.CARD_SHADOW,
         content=ft.Column(
             [
-                ft.Text("Leaderboard Position:", **styles.BOX_TEXT_STYLE2, weight=ft.FontWeight.W_500,),
-                ft.Text("3rd", **styles.BOX_TEXT_STYLE2, size=30, weight=ft.FontWeight.BOLD, ),
+                ft.Text("Leaderboard Position:", **styles.BOX_TEXT_STYLE2, size = 20, weight=ft.FontWeight.W_600,),
+                ft.Text("3rd", **styles.BOX_TEXT_STYLE2, size=32, weight=ft.FontWeight.BOLD, ),
                 ft.Text("You're x points behind y!", **styles.BOX_TEXT_STYLE2,),
+                leaderboard_button,  
             ],    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         ), 
     )
 
 
 record_button = ft.Button(
-    content = "Record"
+    style = styles.RECORD_BUTTON,
+    content=ft.Row(
+        alignment=ft.MainAxisAlignment.CENTER,
+        controls=[
+            ft.Text("Record", size=18),
+            ft.Icon(ft.Icons.ADJUST_OUTLINED, color="#FFE8EA",),
+        ],
+    )
 )
 
 
@@ -90,7 +108,7 @@ def home_view() -> ft.Control:
                 ft.Row(
                     controls=[
                         ft.Container(
-                            content= ft.Text("Explore your dashboard", size = 16,  **styles.HEADING2_TEXT_STYLE, ),
+                            content= ft.Text("Explore your dashboard", size = 16,  **styles.HOME_PARAGRAPH_TEXT, ),
                         ),
                         
                     ],
@@ -101,7 +119,7 @@ def home_view() -> ft.Control:
                     content=ft.Column(
                         horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
                         controls=[
-                            ft.Text("Daily updates:", **styles.HOME_PARAGRAPH_TEXT),
+                            # ft.Text("Daily updates:", **styles.HOME_PARAGRAPH_TEXT),
                             two_boxes_layout,
                             leaderboard_box, 
                         ]
@@ -110,8 +128,10 @@ def home_view() -> ft.Control:
                 # RIGHT COLUMN 
                 ft.Container(
                     content= ft.Column(
+                        horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
                         controls=[ 
                         ft.Text("Start a new session?", size = 16,  **styles.HEADING2_TEXT_STYLE, ),
+                        record_button, 
                         ]
                     )
                     

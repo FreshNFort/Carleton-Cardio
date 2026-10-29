@@ -12,9 +12,7 @@ BOX_STYLE = {
 BOX_TEXT_STYLE1 = {
     "color": "#FFE8EA",   
     "text_align": ft.TextAlign.CENTER, 
-
 }
-
 
 BOX_TEXT_STYLE2 = {
     "color": "#5C111A",   
@@ -30,6 +28,8 @@ HEADING1_TEXT_STYLE = {
 HEADING2_TEXT_STYLE = {
     "weight": ft.FontWeight.W_600,
     "color": "#551414",
+    "text_align": ft.TextAlign.CENTER, 
+
 }
 
 BODY_STYLE = {
@@ -65,6 +65,28 @@ CARD_SHADOW = ft.BoxShadow(
     ),  
     offset=ft.Offset(0, 4),  # Shifts shadow slightly downward
 )
+
+
+RECORD_BUTTON = ft.ButtonStyle(
+    color= "#FFE8EA",
+    bgcolor= "#7C2932",
+    elevation=6,
+    shadow_color=ft.Colors.BLACK,
+    padding=ft.Padding.symmetric(horizontal=24, vertical=24),
+    shape=ft.RoundedRectangleBorder(radius=500),
+
+)
+
+LEADERBOARD_BUTTON = ft.ButtonStyle(
+    color= "#FFE8EA",
+    bgcolor= "#91434C",
+    elevation=6,
+    shadow_color=ft.Colors.BLACK,
+    padding=ft.Padding.symmetric(horizontal=20, vertical=20),
+    shape=ft.RoundedRectangleBorder(radius=500),
+
+)
+
 
 HOME_PARAGRAPH_TEXT = {
     "color":"#551414",
