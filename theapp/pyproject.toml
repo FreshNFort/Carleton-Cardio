@@ -7,7 +7,11 @@ authors = [
     { name = "Lorisimo1", email = "lorisnifasha24@gmail.com" }
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "datetime>=6.0",
+    "firebase-admin>=7.7.0",
+    "flet>=1.0.5",
+]
 
 [project.scripts]
 theapp = "theapp:main"
@@ -15,3 +19,9 @@ theapp = "theapp:main"
 [build-system]
 requires = ["uv_build>=0.13.2,<0.14.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "flet-cli>=1.0.5",
+    "flet-desktop>=1.0.5",
+]

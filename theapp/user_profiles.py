@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-cred = credentials.Certificate(r"C:\Users\noahw\Documents\Carleton-Cardio\theapp\carleton-cardio-firebase-adminsdk-fbsvc-99fe63f986.json")
+cred = credentials.Certificate(r"Carleton-Cardio/theapp/carleton-cardio-firebase-adminsdk-fbsvc-d5e61843a8.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -23,7 +23,7 @@ USERS_COLLECTION = "users"
 #     print("Document not found.")
 
 
-def create_new_user_profile(UserId, username, avatar_url):
+def create_profile(UserId, username, avatar_url: str = None):
     user_ref = db.collection(USERS_COLLECTION).document(UserId)
     profile_data = {
         "username": username,
@@ -51,3 +51,10 @@ def update_user_distance(UserId, distance_km):
     new_distance = round(current_distance + distance_km, 2)
     user_ref.update({"total_distance_km": new_distance})
     return new_distance
+
+if __name__ == "__main__":
+    test_uid = "user_noah_123"
+    create_profile(test_uid, "noah_runs", )
+    print("Fetched profile:", get_user_profile(test_uid))
+    update_user_distance(test_uid, 3.4)
+    print("Updated profile:", get_user_profile(test_uid))
