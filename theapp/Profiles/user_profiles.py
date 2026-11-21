@@ -53,8 +53,8 @@ def update_user_distance(UserId, distance_km):
     return new_distance
 
 if __name__ == "__main__":
-    test_uid = "user_noah_123"
-    create_profile(test_uid, "noah_runs", )
+    test_uid = "ActivityTester"
+    create_profile(test_uid, "ACTTEST", )
     print("Fetched profile:", get_user_profile(test_uid))
-    update_user_distance(test_uid, 3.4)
+    update_user_distance(test_uid, 0.0)
     print("Updated profile:", get_user_profile(test_uid))
