@@ -1,8 +1,8 @@
 from datetime import datetime, timezone
 import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase_admin import auth, credentials, firestore
 
-cred = credentials.Certificate(r"Carleton-Cardio/theapp/carleton-cardio-firebase-adminsdk-fbsvc-d5e61843a8.json")
+cred = credentials.Certificate(r"theapp\carleton-cardio-firebase-adminsdk-fbsvc-99fe63f986.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -23,11 +23,22 @@ USERS_COLLECTION = "users"
 #     print("Document not found.")
 
 
-def create_profile(UserId, username, avatar_url: str = None):
+def create_profile(email, password, username):
+    user_record = auth.create_user(
+        email = email,
+        password = password,
+        display_name = username
+    )
+
+    UserId = user_record.uid
     user_ref = db.collection(USERS_COLLECTION).document(UserId)
+
+
     profile_data = {
+        "uid": UserId,
         "username": username,
-        "avatar_url": avatar_url,
+        "email": email,
+        "avatar_url": None,
         "total_distance_km": 0.0,
         "created_at": datetime.now(timezone.utc),
     }
