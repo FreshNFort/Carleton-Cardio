@@ -6,7 +6,7 @@ from firebase_admin import credentials, firestore
 #Checks if firebase is alr up
 if not firebase_admin._apps:
     cred = credentials.Certificate(
-        r"./theapp/carleton-cardio-firebase-adminsdk-fbsvc-d5e61843a8.json"
+        "./theapp/cardioKey.json"
     )
     firebase_admin.initialize_app(cred)
 

@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 import firebase_admin
 from firebase_admin import auth, credentials, firestore
 
-cred = credentials.Certificate(r"theapp\carleton-cardio-firebase-adminsdk-fbsvc-99fe63f986.json")
+cred = credentials.Certificate(r"theapp\cardioKey.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
