@@ -442,6 +442,18 @@ wheels = [
 ]
 
 [[package]]
+name = "flet-geolocator"
+version = "1.0.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "flet" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e1/52/757ba108cfcc48f894efd42ba583b7b4f4adb9687cf6a6d90fbed7863c95/flet_geolocator-1.0.5.tar.gz", hash = "sha256:2f0c89a3a6531d7849fa469fc50ceb67c0039f89487cdec2c5567c0eca299c1f", size = 15579, upload-time = "2026-10-21T20:43:59.786Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/95/3c/57d349c2ecaed6ae2d71ad64a54e1fed4bc4407a865676b9994634d8ffda/flet_geolocator-1.0.5-py3-none-any.whl", hash = "sha256:a9ca9a546368ddd311a86180b7b62d1e4c88cbc11de52b24cbeb97b1a97c5be2", size = 16691, upload-time = "2026-10-21T20:43:58.884Z" },
+]
+
+[[package]]
 name = "flet-platform-assets"
 version = "1.0.5"
 source = { registry = "https://pypi.org/simple" }
@@ -1237,6 +1249,7 @@ dependencies = [
     { name = "datetime" },
     { name = "firebase-admin" },
     { name = "flet" },
+    { name = "flet-geolocator" },
 ]
 
 [package.dev-dependencies]
@@ -1250,6 +1263,7 @@ requires-dist = [
     { name = "datetime", specifier = ">=6.0" },
     { name = "firebase-admin", specifier = ">=7.7.0" },
     { name = "flet", specifier = ">=1.0.5" },
+    { name = "flet-geolocator", specifier = ">=1.0.5" },
 ]
 
 [package.metadata.requires-dev]
