@@ -1,8 +1,8 @@
 from datetime import datetime, timezone
 import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase_admin import auth, credentials, firestore
 
-cred = credentials.Certificate(r"Carleton-Cardio/theapp/carleton-cardio-firebase-adminsdk-fbsvc-d5e61843a8.json")
+cred = credentials.Certificate(r"theapp\cardioKey.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -23,11 +23,22 @@ USERS_COLLECTION = "users"
 #     print("Document not found.")
 
 
-def create_profile(UserId, username, avatar_url: str = None):
+def create_profile(email, password, username):
+    user_record = auth.create_user(
+        email = email,
+        password = password,
+        display_name = username
+    )
+
+    UserId = user_record.uid
     user_ref = db.collection(USERS_COLLECTION).document(UserId)
+
+
     profile_data = {
+        "uid": UserId,
         "username": username,
-        "avatar_url": avatar_url,
+        "email": email,
+        "avatar_url": None,
         "total_distance_km": 0.0,
         "created_at": datetime.now(timezone.utc),
     }
@@ -53,8 +64,8 @@ def update_user_distance(UserId, distance_km):
     return new_distance
 
 if __name__ == "__main__":
-    test_uid = "user_noah_123"
-    create_profile(test_uid, "noah_runs", )
+    test_uid = "ActivityTester"
+    create_profile(test_uid, "ACTTEST", )
     print("Fetched profile:", get_user_profile(test_uid))
-    update_user_distance(test_uid, 3.4)
+    update_user_distance(test_uid, 0.0)
     print("Updated profile:", get_user_profile(test_uid))
