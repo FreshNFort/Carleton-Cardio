@@ -1,4 +1,3 @@
-from fastapi.datastructures import Default
 import flet as ft
 
 # styling for box elements 

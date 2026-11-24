@@ -3,13 +3,12 @@ import styles
 
 from screens.home import home_view
 from screens.map import map_view
-from screens.profile import profile_view
-from screens.stats import stats_view
-from screens.record import record_view
-from screens.leaderboard import leaderboard_view
+#from screens.profile import profile_view
+from screens.leaderboardview import leaderboard_view
 
 
-SCREENS = [home_view, map_view, stats_view, leaderboard_view, profile_view, ]  # same order as the navbar destinations
+SCREENS = [home_view, map_view, leaderboard_view, ]  # same order as the navbar destinations
+#SCREENS = [home_view, map_view, leaderboard_view, profile_view, ]
 
 def main(page: ft.Page):
 
@@ -44,11 +43,9 @@ def main(page: ft.Page):
         label_behavior=ft.NavigationBarLabelBehavior.ONLY_SHOW_SELECTED,
         destinations=[
             ft.NavigationBarDestination(icon=ft.Icons.HOME_OUTLINED, label="Home"),
-            # ft.NavigationBarDestination(icon=ft.Icons.ACCESS_TIME, label="Record"),
             ft.NavigationBarDestination(icon=ft.Icons.MAP_OUTLINED, label="Maps"),
-            ft.NavigationBarDestination(icon=ft.Icons.QUERY_STATS, label="Stats"),
             ft.NavigationBarDestination(icon=ft.Icons.LEADERBOARD_OUTLINED, label="Leader\nboard"),
-            ft.NavigationBarDestination(icon=ft.Icons.PERSON_OUTLINE_OUTLINED, label="Profile"),
+            #ft.NavigationBarDestination(icon=ft.Icons.PERSON_OUTLINE_OUTLINED, label="Profile"),
 
         ],
         on_change=on_nav_change,
