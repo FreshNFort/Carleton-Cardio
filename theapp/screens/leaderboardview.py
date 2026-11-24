@@ -1,4 +1,14 @@
 import flet as ft
+
+def leaderboard_view() -> ft.Control:
+    return ft.Column([
+        ft.Text("Leaderboard", size=28, weight=ft.FontWeight.BOLD),
+
+    ], spacing=16)
+
+
+"""
+import flet as ft
 from Profiles.leaderboard import get_leaderboard
 
 def main(page: ft.Page):
@@ -159,3 +169,5 @@ def main(page: ft.Page):
 
 if __name__ == "__main__":
     ft.run(main)
+
+    """
