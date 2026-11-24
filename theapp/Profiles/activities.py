@@ -1,13 +1,12 @@
 from datetime import datetime, timezone
 import firebase_admin
 from firebase_admin import credentials, firestore
-#YOU HAVE TO BE IN CARLETON CARDIO DIRECTORY FOR THIS TO RUN, I'll try to fix tmr
+from pathlib import Path
 
 #Checks if firebase is alr up
 if not firebase_admin._apps:
-    cred = credentials.Certificate(
-        "./theapp/cardioKey.json"
-    )
+    cred_path = Path(__file__).resolve().parent.parent / "cardioKey.json"
+    cred = credentials.Certificate(str(cred_path))
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
