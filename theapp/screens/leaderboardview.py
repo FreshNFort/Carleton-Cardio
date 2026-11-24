@@ -1,4 +1,5 @@
 import flet as ft
+from Profiles.leaderboard import get_leaderboard
 
 def main(page: ft.Page):
     page.title = "Leaderboard"
@@ -8,17 +9,13 @@ def main(page: ft.Page):
     page.bgcolor = "#5C2424"
     page.theme_mode = ft.ThemeMode.LIGHT
 
-    # Sample Data
-    weekly_data = [
-        {"rank": 1, "name": "David", "points": "2,403"},
-        {"rank": 2, "name": "Leana", "points": "2,100"},
-        {"rank": 3, "name": "Savanah", "points": "2,056"},
-        {"rank": 4, "name": "Zain", "points": "1,987"},
-        {"rank": 5, "name": "John", "points": "1,795"},
-        {"rank": 6, "name": "Sean", "points": "1,200"},
-        {"rank": 7, "name": "Jack", "points": "986"},
-        {"rank": 8, "name": "Madelyn", "points": "645"},
-    ]
+    #Data
+    leaderboard = get_leaderboard()
+
+    weekly_data = []
+    for user in leaderboard:
+        weekly_data.append({"rank": user["rank"], "name": user["username"], "points": f"{user["total_distance_km"]} km"})
+        
 
     podium_container = ft.Row(
         alignment = ft.MainAxisAlignment.CENTER,

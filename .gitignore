@@ -7,3 +7,6 @@
 serviceAccountKey.json
 *.env__pycache__/
 *.pyc
+
+theapp/cardioKey.json
+*.json
