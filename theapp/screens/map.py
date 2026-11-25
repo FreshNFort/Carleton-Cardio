@@ -14,6 +14,8 @@ from storage import finish_session, load_active_session, load_sessions, save_act
 from tracking import append_fix, distance_m, format_distance
 from screens import home
 
+from Profiles.activities import log_activity
+
 log = logging.getLogger("app.views.map")
 
 MAROON = "#551414"      # text (matches styles.HOME_PARAGRAPH_TEXT)
@@ -299,6 +301,15 @@ def map_view(
         try:
             started = datetime.fromisoformat(active_session["started_at"])
             active_session["duration_s"] = max(0, int((ended - started).total_seconds()))
+            distance_meters = float(active_session.get("distance_m", 0.0))
+            duration_seconds = float(active_session.get("duration_s", 0))
+            if distance_meters > 0 and duration_seconds > 0:
+                log_activity(
+                    user_id="noah fortin",
+                    distance_meters=distance_meters,
+                    duration_seconds=duration_seconds,
+                    is_tunnel=False,
+                )
         except (TypeError, ValueError):
             active_session["duration_s"] = 0
         sessions = await finish_session(prefs, active_session)
