@@ -9,13 +9,12 @@ def build_podium_step(user: dict, rank: int, bar_height: int, bar_color: str, is
         spacing = 6,
         controls = [
             ft.Text(
-                user["name"].split()[0],
-                color = ft.Colors.WHITE,
-                weight = ft.FontWeight.BOLD,
-                size = 14,
-                max_lines = 1,
-                overflow = ft.TextOverflow.ELLIPSIS,
-            ),
+                user["name"],
+                color=ft.Colors.WHITE,
+                weight=ft.FontWeight.BOLD,
+                size=14,
+                max_lines=1,
+                overflow=ft.TextOverflow.ELLIPSIS),
             ft.Container(
                 content = ft.Text(user["points"], color = ft.Colors.WHITE, size = 11, weight = ft.FontWeight.W_600),
                 bgcolor = "#8879F0",

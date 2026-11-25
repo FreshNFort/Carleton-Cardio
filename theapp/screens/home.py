@@ -1,19 +1,10 @@
 import flet as ft
 import styles 
+from Profiles.activities import get_user_totals
+from Profiles.user_profiles import get_user_profile
+from Profiles.leaderboard import get_leaderboard
 
-#NEWW
-from Profiles.activities import get_user_totals  # replace 'database' with your teammate's file name
-
-USER_ID = "ActivityTester"  # placeholder until the app has real logins
-
-def load_totals() -> tuple[str, str]:
-    """Fetches totals from Firebase and formats them for the stat boxes."""
-    try:
-        totals = get_user_totals(USER_ID)
-        return f"{totals['distance_km']} km", f"{totals['time_hours']} hrs"
-    except Exception as e:
-        print("Could not load totals:", e)
-        return "--", "--"
+USER_ID = "noah fortin"
 
 # CREATES A  BOX/CONTAINER OF TEXT. TITLE IS SMALLER, UNBOLDED, VALUE IS THE NUMBERED AMOUNT DISPLAY LARGER AND IN BOLD  
 def stat_box(title: str,value:str) -> ft.Container:
@@ -43,18 +34,20 @@ header = ft.Row(
         ),  
     ],
     alignment=ft.MainAxisAlignment.CENTER,
+    
+
 )
 
-"""
 two_boxes_layout = ft.ResponsiveRow(
     spacing=10,  
     run_spacing=10,
     controls=[
         stat_box("Distance:", "3.2 km"),
         stat_box("Time Spent:", "2.5 hrs"),
+        
     ],
 )
-"""
+
 
 leaderboard_button = ft.Button(
     style = styles.LEADERBOARD_BUTTON,
@@ -97,17 +90,19 @@ record_button = ft.Button(
 
 
 def home_view() -> ft.Control:
-    distance_text, time_text = load_totals()
+    # 1. Fetch Noah's profile and update the Welcome title & Distance box
+    profile = get_user_profile(USER_ID) or {}
+    username = profile.get("username", "User")
+    total_km = profile.get("total_distance_km", 0.0)
 
-    two_boxes_layout = ft.ResponsiveRow(
-        spacing=10,
-        run_spacing=10,
-        controls=[
-            stat_box("Distance:", distance_text),
-            stat_box("Time Spent:", time_text),
-        ],
-    )
+    header.controls[0].content.value = f"Welcome, {username}!"
+    two_boxes_layout.controls[0] = stat_box("Distance:", f"{total_km} km")
 
+    # 2. Fetch Noah's live rank and update the Leaderboard Position box
+    for entry in get_leaderboard():
+        if entry["uid"] == USER_ID:
+            leaderboard_box.content.controls[1].value = f"#{entry['rank']}"
+            break
 
     return ft.Column(
         scroll=ft.ScrollMode.HIDDEN,
