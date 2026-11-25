@@ -101,7 +101,7 @@ def home_view(on_record=None) -> ft.Control:
             alignment=ft.MainAxisAlignment.CENTER,
             controls=[
                 ft.Text("View Leaderboard", size=14),
-                ft.Icon(ft.Icons.LEADERBOARD_ROUNDED, color="#FFE8EA"),
+                ft.Icon(ft.Icons.LEADERBOARD_ROUNDED, color="#FFEAD3"),
             ],
         ),
     )
@@ -130,7 +130,7 @@ def home_view(on_record=None) -> ft.Control:
             alignment=ft.MainAxisAlignment.CENTER,
             controls=[
                 ft.Text("Record", size=18),
-                ft.Icon(ft.Icons.ADJUST_OUTLINED, color="#FFE8EA"),
+                ft.Icon(ft.Icons.ADJUST_OUTLINED, color="#FFEAD3"),
             ],
         ),
     )

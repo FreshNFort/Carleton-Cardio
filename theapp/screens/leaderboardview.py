@@ -82,7 +82,7 @@ def leaderboard_view() -> ft.Control:
         print(f"Could not load leaderboard: {error}")
         return ft.Column(
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            controls=[ft.Text("Couldn't load the leaderboard. Check your connection.", color="#551414")],
+            controls=[ft.Text("Couldn't load the leaderboard. Check your connection.", color="#9E3B3B")],
         )
 
     weekly_data = []
@@ -133,7 +133,7 @@ def leaderboard_view() -> ft.Control:
     # Bottom White Sheet
     bottom_sheet = ft.Container(
         expand = True,
-        bgcolor = "#F8F7FC",
+        bgcolor = "#FFEAD3",
         border_radius = 28,
         padding = 15,
         content = list_view,
