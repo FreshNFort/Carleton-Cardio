@@ -1,5 +1,3 @@
-"""Local session persistence using Flet SharedPreferences."""
-
 from __future__ import annotations
 
 import json

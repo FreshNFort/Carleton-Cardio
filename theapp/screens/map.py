@@ -1,5 +1,3 @@
-"""Live walking map and session controls."""
-
 from __future__ import annotations
 
 import asyncio
