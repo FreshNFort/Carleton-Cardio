@@ -1,9 +1,14 @@
 from datetime import datetime, timezone
 import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase_admin import auth, credentials, firestore
+from pathlib import Path
 
-cred = credentials.Certificate(r"Carleton-Cardio/theapp/carleton-cardio-firebase-adminsdk-fbsvc-d5e61843a8.json")
-firebase_admin.initialize_app(cred)
+#Checks if firebase is alr up
+if not firebase_admin._apps:
+    cred_path = Path(__file__).resolve().parent.parent / "cardioKey.json"
+    cred = credentials.Certificate(str(cred_path))
+    firebase_admin.initialize_app(cred)
+
 db = firestore.client()
 
 USERS_COLLECTION = "users"
@@ -23,11 +28,22 @@ USERS_COLLECTION = "users"
 #     print("Document not found.")
 
 
-def create_profile(UserId, username, avatar_url: str = None):
+def create_profile(email, password, username):
+    user_record = auth.create_user(
+        email = email,
+        password = password,
+        display_name = username
+    )
+
+    UserId = user_record.uid
     user_ref = db.collection(USERS_COLLECTION).document(UserId)
+
+
     profile_data = {
+        "uid": UserId,
         "username": username,
-        "avatar_url": avatar_url,
+        "email": email,
+        "avatar_url": None,
         "total_distance_km": 0.0,
         "created_at": datetime.now(timezone.utc),
     }
@@ -53,8 +69,16 @@ def update_user_distance(UserId, distance_km):
     return new_distance
 
 if __name__ == "__main__":
-    test_uid = "user_noah_123"
-    create_profile(test_uid, "noah_runs", )
-    print("Fetched profile:", get_user_profile(test_uid))
-    update_user_distance(test_uid, 3.4)
-    print("Updated profile:", get_user_profile(test_uid))
+    test_email = "noa@mailer.com"
+
+    try:
+        profile = create_profile(test_email, "PASSWORD123123", "NotNoah F")
+        created_uid = profile["uid"]
+    except auth.EmailAlreadyExistsError:
+        existing_user = auth.get_user_by_email(test_email)
+        created_uid = existing_user.uid
+        print("User already exists, using existing UID:", created_uid)
+
+    print("Fetched profile:", get_user_profile(created_uid))
+    update_user_distance(created_uid, 0.95)
+    print("Updated profile:", get_user_profile(created_uid))

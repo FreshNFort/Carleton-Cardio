@@ -5,4 +5,8 @@
 *firebase-adminsdk*.json
 *serviceAccountKey*.json
 serviceAccountKey.json
-*.env
+*.env__pycache__/
+*.pyc
+
+theapp/cardioKey.json
+*.json

@@ -1,6 +1,10 @@
 import flet as ft
-import styles
+import styles 
+from Profiles.activities import get_user_totals
+from Profiles.user_profiles import get_user_profile
+from Profiles.leaderboard import get_leaderboard
 
+USER_ID = "noah fortin"
 
 def stat_box(title: str, value: str) -> ft.Container:
     return ft.Container(
@@ -87,44 +91,75 @@ def home_view(on_record=None) -> ft.Control:
             ],
         ),
     )
+)
+
+
+def home_view() -> ft.Control:
+    # 1. Fetch Noah's profile and update the Welcome title & Distance box
+    profile = get_user_profile(USER_ID) or {}
+    username = profile.get("username", "User")
+    total_km = profile.get("total_distance_km", 0.0)
+
+    header.controls[0].content.value = f"Welcome, {username}!"
+    two_boxes_layout.controls[0] = stat_box("Distance:", f"{total_km} km")
+
+    # 2. Fetch Noah's live rank and update the Leaderboard Position box
+    for entry in get_leaderboard():
+        if entry["uid"] == USER_ID:
+            leaderboard_box.content.controls[1].value = f"#{entry['rank']}"
+            break
 
     return ft.Column(
         scroll=ft.ScrollMode.HIDDEN,
         alignment=ft.Alignment(0, -1),
         horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
         expand=True,
-        controls=[
-            ft.SafeArea(
-                content=ft.ResponsiveRow(
+        
+        controls = 
+        [
+        ft.SafeArea(
+            content=ft.ResponsiveRow(
+            # spacing=15,
+            # run_spacing=15,
+            width = 100,
+            controls=[
+                header,
+                # HEADER
+                ft.Row(
                     controls=[
-                        header,
-                        ft.Row(
-                            controls=[
-                                ft.Container(
-                                    content=ft.Text(
-                                        "Explore your dashboard", size=16, **styles.HOME_PARAGRAPH_TEXT
-                                    ),
-                                ),
-                            ],
-                            alignment=ft.MainAxisAlignment.CENTER,
-                        ),
                         ft.Container(
-                            content=ft.Column(
-                                horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
-                                controls=[two_boxes_layout, leaderboard_box],
-                            ),
+                            content= ft.Text("Explore your dashboard", size = 16,  **styles.HOME_PARAGRAPH_TEXT, ),
                         ),
-                        ft.Container(
-                            content=ft.Column(
-                                horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
-                                controls=[
-                                    ft.Text("Start a new session?", size=16, **styles.HEADING2_TEXT_STYLE),
-                                    record_button,
-                                ],
-                            ),
-                        ),
+                        
                     ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),  
+                # BOXES COLUMN 
+                ft.Container(
+                    content=ft.Column(
+                        horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
+                        controls=[
+                            # ft.Text("Daily updates:", **styles.HOME_PARAGRAPH_TEXT),
+                            two_boxes_layout,
+                            leaderboard_box, 
+                        ]
+                    ),
                 ),
-            ),
-        ],
-    )
+                # RIGHT COLUMN 
+                ft.Container(
+                    content= ft.Column(
+                        horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
+                        controls=[ 
+                        ft.Text("Start a new session?", size = 16,  **styles.HEADING2_TEXT_STYLE, ),
+                        record_button, 
+                        ]
+                    )
+                    
+                    
+                ),
+            ],
+        ),
+    ), 
+],
+        
+)
