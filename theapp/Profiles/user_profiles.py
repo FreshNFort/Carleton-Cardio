@@ -69,8 +69,16 @@ def update_user_distance(UserId, distance_km):
     return new_distance
 
 if __name__ == "__main__":
-    test_uid = "ActivityTester"
-    create_profile(test_uid, "ACTTEST", )
-    print("Fetched profile:", get_user_profile(test_uid))
-    update_user_distance(test_uid, 0.0)
-    print("Updated profile:", get_user_profile(test_uid))
+    test_email = "noa@mailer.com"
+
+    try:
+        profile = create_profile(test_email, "PASSWORD123123", "NotNoah F")
+        created_uid = profile["uid"]
+    except auth.EmailAlreadyExistsError:
+        existing_user = auth.get_user_by_email(test_email)
+        created_uid = existing_user.uid
+        print("User already exists, using existing UID:", created_uid)
+
+    print("Fetched profile:", get_user_profile(created_uid))
+    update_user_distance(created_uid, 0.95)
+    print("Updated profile:", get_user_profile(created_uid))
