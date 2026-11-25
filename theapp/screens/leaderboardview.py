@@ -101,9 +101,9 @@ def leaderboard_view() -> ft.Control:
     list_view = ft.ListView(expand = True, spacing = 10, padding = 15)
 
     podium_container.controls = [
-        build_podium_step(weekly_data[1], rank = 2, bar_height = 105, bar_color = "#FDB773"),
-        build_podium_step(weekly_data[0], rank = 1, bar_height = 135, bar_color = "#FDB773", is_first = True),
-        build_podium_step(weekly_data[2], rank = 3, bar_height = 85, bar_color = "#FDB773"),
+        build_podium_step(weekly_data[1], rank = 2, bar_height = 105, bar_color = "#EA7B7B"),
+        build_podium_step(weekly_data[0], rank = 1, bar_height = 135, bar_color = "#EA7B7B", is_first = True),
+        build_podium_step(weekly_data[2], rank = 3, bar_height = 85, bar_color = "#EA7B7B"),
     ]
     list_view.controls = [build_rank_row(u) for u in weekly_data[3:]]
     
