@@ -73,7 +73,7 @@ def main(page: ft.Page):
 
     def show(index: int, start_recording: bool = False):
         if index == HOME:
-            body.content = home_view(on_record=go_record)
+            body.content = home_view(on_record=go_record, on_leaderboard=go_leaderboard)
         elif index == MAP:
             body.content = get_map(start_immediately=start_recording)
         elif index == LEADERBOARD:
@@ -85,6 +85,10 @@ def main(page: ft.Page):
     def go_record(e=None):
         page.navigation_bar.selected_index = MAP
         show(MAP, start_recording=True)
+
+    def go_leaderboard(e=None):
+        page.navigation_bar.selected_index = LEADERBOARD  # keeps the highlighted tab in sync
+        show(LEADERBOARD)
 
     def on_nav_change(e):
         show(e.control.selected_index)
@@ -102,7 +106,7 @@ def main(page: ft.Page):
         indicator_color=styles.NAV_INDICATOR_COLOR,
     )
 
-    body.content = home_view(on_record=go_record)
+    body.content = home_view(on_record=go_record, on_leaderboard=go_leaderboard)
     page.add(ft.SafeArea(body, expand=True))
 
 
