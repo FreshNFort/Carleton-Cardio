@@ -4,9 +4,13 @@ from firebase_admin import credentials, firestore
 from pathlib import Path
 
 #Checks if firebase is alr up
+# Key file lives in the theapp folder, one level above this Profiles folder.
+# Building the path from this file's location means it works from any launch folder.
+KEY_PATH = Path(__file__).resolve().parent.parent / "cardioKey.json"
+
+# Checks if firebase is already up
 if not firebase_admin._apps:
-    cred_path = Path(__file__).resolve().parent.parent / "cardioKey.json"
-    cred = credentials.Certificate(str(cred_path))
+    cred = credentials.Certificate(str(KEY_PATH))
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
