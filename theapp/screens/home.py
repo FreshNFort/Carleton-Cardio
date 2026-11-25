@@ -1,6 +1,19 @@
 import flet as ft
 import styles 
 
+#NEWW
+from Profiles.activities import get_user_totals  # replace 'database' with your teammate's file name
+
+USER_ID = "ActivityTester"  # placeholder until the app has real logins
+
+def load_totals() -> tuple[str, str]:
+    """Fetches totals from Firebase and formats them for the stat boxes."""
+    try:
+        totals = get_user_totals(USER_ID)
+        return f"{totals['distance_km']} km", f"{totals['time_hours']} hrs"
+    except Exception as e:
+        print("Could not load totals:", e)
+        return "--", "--"
 
 # CREATES A  BOX/CONTAINER OF TEXT. TITLE IS SMALLER, UNBOLDED, VALUE IS THE NUMBERED AMOUNT DISPLAY LARGER AND IN BOLD  
 def stat_box(title: str,value:str) -> ft.Container:
@@ -30,20 +43,18 @@ header = ft.Row(
         ),  
     ],
     alignment=ft.MainAxisAlignment.CENTER,
-    
-
 )
 
+"""
 two_boxes_layout = ft.ResponsiveRow(
     spacing=10,  
     run_spacing=10,
     controls=[
         stat_box("Distance:", "3.2 km"),
         stat_box("Time Spent:", "2.5 hrs"),
-        
     ],
 )
-
+"""
 
 leaderboard_button = ft.Button(
     style = styles.LEADERBOARD_BUTTON,
@@ -86,6 +97,17 @@ record_button = ft.Button(
 
 
 def home_view() -> ft.Control:
+    distance_text, time_text = load_totals()
+
+    two_boxes_layout = ft.ResponsiveRow(
+        spacing=10,
+        run_spacing=10,
+        controls=[
+            stat_box("Distance:", distance_text),
+            stat_box("Time Spent:", time_text),
+        ],
+    )
+
 
     return ft.Column(
         scroll=ft.ScrollMode.HIDDEN,
