@@ -10,16 +10,11 @@ import flet as ft
 import flet_geolocator as fg
 import flet_map as fm
 
-import styles
-
 from storage import finish_session, load_active_session, load_sessions, save_active_session
 from tracking import append_fix, distance_m, format_distance
-from screens import home
+from views import home
 
 log = logging.getLogger("app.views.map")
-
-MAROON = "#551414"      # text (matches styles.HOME_PARAGRAPH_TEXT)
-MAROON_BTN = "#7C2932"  # accents / buttons (matches styles.RECORD_BUTTON)
 
 # Approximate bounds around Carleton University's main campus in Ottawa.
 SOUTH, WEST, NORTH, EAST = 45.3820, -75.7048, 45.3948, -75.6868
@@ -39,9 +34,6 @@ def map_view(
             accuracy=fg.GeolocatorPositionAccuracy.BEST, distance_filter=0
         )
     )
-    for service in (prefs, geolocator):
-        if service not in page.services:
-            page.services.append(service)
     locations: list[list[float]] = []
     sessions: list[dict] = []
     active_session: dict | None = None
@@ -114,9 +106,9 @@ def map_view(
         ],
     )
 
-    distance_label = ft.Text("0 m", size=28, weight=ft.FontWeight.BOLD, color=MAROON)
-    points_label = ft.Text("0 points", color=MAROON)
-    status_label = ft.Text("Ready when you are", color=MAROON)
+    distance_label = ft.Text("0 m", size=28, weight=ft.FontWeight.BOLD)
+    points_label = ft.Text("0 points")
+    status_label = ft.Text("Ready when you are")
     history_column = ft.Column(spacing=4)
     record_button = ft.Button(
         content=ft.Row(
@@ -124,19 +116,19 @@ def map_view(
             alignment=ft.MainAxisAlignment.CENTER,
         ),
         color=ft.Colors.WHITE,
-        bgcolor=MAROON_BTN,
+        bgcolor=ft.Colors.GREEN_700,
     )
 
     def refresh_route() -> None:
         points = [fm.MapLatitudeLongitude(latitude=lat, longitude=lon) for lat, lon in locations]
         trail.polylines = (
-            [fm.PolylineMarker(coordinates=points, color=MAROON_BTN, stroke_width=6)]
+            [fm.PolylineMarker(coordinates=points, color=ft.Colors.GREEN_700, stroke_width=6)]
             if len(points) > 1 else []
         )
         live_marker.markers = (
             [fm.Marker(
                 coordinates=points[-1],
-                content=ft.Icon(ft.Icons.LOCATION_ON, color=MAROON_BTN, size=34),
+                content=ft.Icon(ft.Icons.LOCATION_ON, color=ft.Colors.GREEN_700, size=34),
                 width=38,
                 height=38,
             )]
@@ -157,26 +149,27 @@ def map_view(
                         f"{session.get('date_label', 'Walk')} · "
                         f"{format_distance(float(session.get('distance_m', 0)))}",
                         expand=True,
-                     color=MAROON),
-                    ft.Text(f"{len(session.get('coordinates', []))} pts", color=MAROON),
+                    ),
+                    ft.Text(f"{len(session.get('coordinates', []))} pts"),
                 ]
             )
             for session in reversed(sessions[-4:])
-        ] or [ft.Text("Completed walks will appear here.", color=MAROON)]
+        ] or [ft.Text("Completed walks will appear here.")]
 
     def update_button() -> None:
         label, icon, color = (
             ("Stop walk", ft.Icons.STOP, ft.Colors.RED_700)
             if is_recording else
-            ("Resume walk", ft.Icons.PLAY_ARROW, MAROON_BTN)
+            ("Resume walk", ft.Icons.PLAY_ARROW, ft.Colors.GREEN_700)
             if active_session else
-            ("Start walk", ft.Icons.FIBER_MANUAL_RECORD, MAROON_BTN)
+            ("Start walk", ft.Icons.FIBER_MANUAL_RECORD, ft.Colors.GREEN_700)
         )
         record_button.content = ft.Row(
             controls=[ft.Icon(icon, size=18), ft.Text(label)],
             alignment=ft.MainAxisAlignment.CENTER,
         )
         record_button.bgcolor = color
+        record_button.update()
 
     async def save_point(lat: float, lon: float, accuracy: float | None) -> None:
         nonlocal raw_samples, filtered_samples
@@ -224,15 +217,6 @@ def map_view(
 
     geolocator.on_position_change = on_position_change
 
-    async def request_initial_fix() -> None:
-        try:
-            await process_fix(await geolocator.get_current_position())
-        except Exception as error:
-            log.warning("Initial location request failed: %s", error)
-            if is_recording:
-                status_label.value = f"Location error: {error}"
-                page.update()
-
     async def start_recording() -> None:
         nonlocal active_session, is_recording, locations, raw_samples, filtered_samples
         if is_recording:
@@ -264,6 +248,23 @@ def map_view(
             page.update()
             return
 
+        try:
+            current_fix = await geolocator.get_current_position()
+        except Exception as error:
+            log.warning("Could not get a location before starting: %s", error)
+            status_label.value = "Could not get your location. Try again outdoors."
+            page.update()
+            return
+        if current_fix.latitude is None or current_fix.longitude is None:
+            status_label.value = "Waiting for a GPS fix before starting."
+            page.update()
+            return
+        latitude, longitude = float(current_fix.latitude), float(current_fix.longitude)
+        if not (SOUTH <= latitude <= NORTH and WEST <= longitude <= EAST):
+            status_label.value = "Walk sessions can only start on Carleton's main campus."
+            page.update()
+            return
+
         raw_samples = filtered_samples = 0
         if active_session is None:
             now = datetime.now(timezone.utc)
@@ -279,7 +280,7 @@ def map_view(
         update_button()
         await save_active_session(prefs, active_session)
         page.update()
-        page.run_task(request_initial_fix)
+        asyncio.create_task(process_fix(current_fix))
 
     async def stop_recording() -> None:
         nonlocal active_session, locations, sessions, is_recording
@@ -305,7 +306,7 @@ def map_view(
     async def handle_button() -> None:
         await stop_recording() if is_recording else await start_recording()
 
-    record_button.on_click = handle_button
+    record_button.on_click = lambda: asyncio.create_task(handle_button())
     transition = ft.Animation(duration=420, curve=ft.AnimationCurve.EASE_IN_OUT_CUBIC)
     home_status = ft.Text("", visible=False, color=ft.Colors.RED_700)
 
@@ -327,8 +328,8 @@ def map_view(
             ft.Column(
                 spacing=2,
                 controls=[
-                    ft.Text("Trailkeeper", size=27, weight=ft.FontWeight.BOLD, color=MAROON),
-                    ft.Text("OpenStreetMap · Carleton University", color=MAROON),
+                    ft.Text("Trailkeeper", size=27, weight=ft.FontWeight.BOLD),
+                    ft.Text("OpenStreetMap · Carleton University"),
                 ],
                 expand=True,
             ),
@@ -339,13 +340,13 @@ def map_view(
         controls=[
             ft.Column(
                 spacing=2,
-                controls=[ft.Text("SESSION DISTANCE", color=MAROON), distance_label],
+                controls=[ft.Text("SESSION DISTANCE"), distance_label],
                 expand=True,
             ),
             ft.Column(
                 spacing=2,
                 horizontal_alignment=ft.CrossAxisAlignment.END,
-                controls=[ft.Text("GPS SAMPLES", color=MAROON), points_label],
+                controls=[ft.Text("GPS SAMPLES"), points_label],
             ),
         ]
     )
@@ -357,16 +358,16 @@ def map_view(
         content=ft.Column(
             spacing=6,
             controls=[
-                ft.Text("RECENT WALKS", weight=ft.FontWeight.BOLD, color=MAROON),
+                ft.Text("RECENT WALKS", weight=ft.FontWeight.BOLD),
                 history_column,
                 ft.Text(
                     "Background GPS may pause when iOS or Android suspends the app.", size=11
-                , color=MAROON),
+                ),
             ],
         ),
         padding=12,
         border_radius=16,
-        bgcolor="#FFF4F5",
+        bgcolor=ft.Colors.GREEN_50,
     )
     map_screen = ft.SafeArea(
         expand=True,
@@ -426,5 +427,5 @@ def map_view(
         if start_immediately:
             await start_recording()
 
-    page.run_task(load_saved_walks)
+    asyncio.create_task(load_saved_walks())
     return root
