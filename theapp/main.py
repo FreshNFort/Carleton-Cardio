@@ -5,10 +5,45 @@ from screens.home import home_view
 from screens.map import map_view
 #from screens.profile import profile_view
 from screens.leaderboardview import leaderboard_view
+from Profiles.user_profiles import get_user_profile
+from Profiles.leaderboard import get_leaderboard
 
-
-SCREENS = [home_view, map_view, leaderboard_view, ]  # same order as the navbar destinations
 #SCREENS = [home_view, map_view, leaderboard_view, profile_view, ]
+
+def profile_view():
+    profile = get_user_profile("noah fortin")
+    username = profile.get("username", "User")
+    total_distance = profile.get("total_distance_km", 0.0)
+
+    header = ft.Row(
+        controls=[
+            ft.Container(
+                padding=ft.Padding.only(top=25),
+                content=ft.Text(
+                    f"Welcome, {username}!",
+                    style=ft.TextStyle(
+                        size=28,
+                        shadow=styles.HEADING_SHADOW,
+                        font_family="Segoe UI",
+                        **styles.HEADING1_TEXT_STYLE,
+                    ),
+                ),
+            ),
+        ],
+        alignment=ft.MainAxisAlignment.CENTER,
+    )
+
+    return ft.Column(
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+        spacing=16,
+        controls=[
+            header,
+            ft.Text(f"Total Distance: {total_distance} km", size=20, weight=ft.FontWeight.BOLD),
+        ],
+    )
+
+SCREENS = [home_view, map_view, leaderboard_view, profile_view]  # same order as the navbar destinations
+
 
 def main(page: ft.Page):
 

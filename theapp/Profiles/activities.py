@@ -3,11 +3,28 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from pathlib import Path
 
-#Checks if firebase is alr up
+
+# Key file lives in the theapp folder, one level above this Profiles folder.
+# Building the path from this file's location means it works from any launch folder.
+KEY_PATH = Path(__file__).resolve().parent.parent / "cardioKey.json"
+
+# Checks if firebase is already up - updated to not be stuck on one file path
 if not firebase_admin._apps:
-    cred_path = Path(__file__).resolve().parent.parent / "cardioKey.json"
-    cred = credentials.Certificate(str(cred_path))
+    cred = credentials.Certificate(str(KEY_PATH))
     firebase_admin.initialize_app(cred)
+
+"""
+#Checks if firebase is alr up
+# Key file lives in the theapp folder, one level above this Profiles folder.
+# Building the path from this file's location means it works from any launch folder.
+KEY_PATH = Path(__file__).resolve().parent.parent / "cardioKey.json"
+
+# Checks if firebase is already up
+if not firebase_admin._apps:
+    cred = credentials.Certificate(str(KEY_PATH))
+    firebase_admin.initialize_app(cred)
+
+"""
 
 db = firestore.client()
 
@@ -73,6 +90,27 @@ def get_user_activities(user_id: str, limit: int = 10) -> list[dict]:
     )
     return [{"id": doc.id, **doc.to_dict()} for doc in docs]
 
+#NEWW
+def get_user_totals(user_id: str) -> dict:
+    """Returns all-time distance (km) and time (hours) across a user's valid activities."""
+    docs = (
+        db.collection(ACTIVITIES_COLLECTION)
+        .where("user_id", "==", user_id)
+        .where("valid", "==", True)
+        .stream()
+    )
+
+    total_km = 0.0
+    total_seconds = 0.0
+    for doc in docs:
+        data = doc.to_dict()
+        total_km += data.get("distance_km", 0.0)
+        total_seconds += data.get("duration_seconds", 0.0)
+
+    return {
+        "distance_km": round(total_km, 1),
+        "time_hours": round(total_seconds / 3600, 1),
+    }
 
 if __name__ == "__main__":
     test_uid = "ActivityTester"
