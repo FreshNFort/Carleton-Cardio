@@ -1,5 +1,4 @@
 import flet as ft
-import styles
 from Profiles.leaderboard import get_leaderboard
 
 def build_podium_step(user: dict, rank: int, bar_height: int, bar_color: str, is_first: bool = False):
@@ -10,14 +9,14 @@ def build_podium_step(user: dict, rank: int, bar_height: int, bar_color: str, is
         controls = [
             ft.Text(
                 user["name"],
-                color=ft.Colors.WHITE,
+                color = "#551414",
                 weight=ft.FontWeight.BOLD,
                 size=14,
                 max_lines=1,
                 overflow=ft.TextOverflow.ELLIPSIS),
             ft.Container(
                 content = ft.Text(user["points"], color = ft.Colors.WHITE, size = 11, weight = ft.FontWeight.W_600),
-                bgcolor = "#8879F0",
+                bgcolor = "#EA7B7B",
                 padding = 10,
                 border_radius = 12,
             ),
@@ -101,9 +100,9 @@ def leaderboard_view() -> ft.Control:
     list_view = ft.ListView(expand = True, spacing = 10, padding = 15)
 
     podium_container.controls = [
-        build_podium_step(weekly_data[1], rank = 2, bar_height = 105, bar_color = "#EA7B7B"),
-        build_podium_step(weekly_data[0], rank = 1, bar_height = 135, bar_color = "#EA7B7B", is_first = True),
-        build_podium_step(weekly_data[2], rank = 3, bar_height = 85, bar_color = "#EA7B7B"),
+        build_podium_step(weekly_data[1], rank = 2, bar_height = 105, bar_color = "#91434C"),
+        build_podium_step(weekly_data[0], rank = 1, bar_height = 135, bar_color = "#91434C", is_first = True),
+        build_podium_step(weekly_data[2], rank = 3, bar_height = 85, bar_color = "#91434C"),
     ]
     list_view.controls = [build_rank_row(u) for u in weekly_data[3:]]
     
@@ -114,7 +113,7 @@ def leaderboard_view() -> ft.Control:
         content = ft.Row(
             alignment = ft.MainAxisAlignment.CENTER,
             controls = [
-                ft.Text("Leaderboard", size = 20, weight = ft.FontWeight.BOLD, color = ft.Colors.WHITE),
+                ft.Text("Leaderboard", size = 20, weight = ft.FontWeight.BOLD, color = "#551414"),
             ],
         ),
     )
@@ -125,7 +124,7 @@ def leaderboard_view() -> ft.Control:
             alignment = ft.MainAxisAlignment.CENTER,
             controls = [ft.Text("Weekly Ranking", color = ft.Colors.WHITE, weight = ft.FontWeight.BOLD, size = 14)]
         ),
-        bgcolor = "#5849C9",
+        bgcolor = "#D25353",
         padding = 10,
         border_radius = 16,
     )
@@ -133,7 +132,7 @@ def leaderboard_view() -> ft.Control:
     # Bottom White Sheet
     bottom_sheet = ft.Container(
         expand = True,
-        bgcolor = "#FFEAD3",
+        bgcolor = "#FFE8EA",
         border_radius = 28,
         padding = 15,
         content = list_view,
