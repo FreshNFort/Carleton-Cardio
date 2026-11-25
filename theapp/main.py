@@ -3,15 +3,19 @@ import styles
 
 from screens.home import home_view
 from screens.map import map_view
-#from screens.profile import profile_view
 from screens.leaderboardview import leaderboard_view
 from Profiles.user_profiles import get_user_profile
-from Profiles.leaderboard import get_leaderboard
 
-#SCREENS = [home_view, map_view, leaderboard_view, profile_view, ]
+HOME, MAP, LEADERBOARD = range(3)  # same order as the navbar destinations
+PROFILE_USER_ID = "noah fortin"
 
-def profile_view():
-    profile = get_user_profile("noah fortin")
+
+def profile_view() -> ft.Control:
+    try:
+        profile = get_user_profile(PROFILE_USER_ID) or {}
+    except Exception as error:
+        print(f"Could not load profile: {error}")
+        profile = {}
     username = profile.get("username", "User")
     total_distance = profile.get("total_distance_km", 0.0)
 
@@ -41,8 +45,6 @@ def profile_view():
             ft.Text(f"Total Distance: {total_distance} km", size=20, weight=ft.FontWeight.BOLD),
         ],
     )
-
-SCREENS = [home_view, map_view, leaderboard_view, profile_view]  # same order as the navbar destinations
 
 
 def main(page: ft.Page):
@@ -74,8 +76,6 @@ def main(page: ft.Page):
             body.content = home_view(on_record=go_record)
         elif index == MAP:
             body.content = get_map(start_immediately=start_recording)
-        elif index == STATS:
-            body.content = stats_view()
         elif index == LEADERBOARD:
             body.content = leaderboard_view()
         else:
@@ -95,8 +95,7 @@ def main(page: ft.Page):
             ft.NavigationBarDestination(icon=ft.Icons.HOME_OUTLINED, label="Home"),
             ft.NavigationBarDestination(icon=ft.Icons.MAP_OUTLINED, label="Maps"),
             ft.NavigationBarDestination(icon=ft.Icons.LEADERBOARD_OUTLINED, label="Leader\nboard"),
-            #ft.NavigationBarDestination(icon=ft.Icons.PERSON_OUTLINE_OUTLINED, label="Profile"),
-
+            # ft.NavigationBarDestination(icon=ft.Icons.PERSON_OUTLINE_OUTLINED, label="Profile"),
         ],
         on_change=on_nav_change,
         bgcolor=styles.NAV_BG_COLOR,

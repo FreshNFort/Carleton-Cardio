@@ -1,10 +1,11 @@
 import flet as ft
-import styles 
+import styles
 from Profiles.activities import get_user_totals
 from Profiles.user_profiles import get_user_profile
 from Profiles.leaderboard import get_leaderboard
 
 USER_ID = "noah fortin"
+
 
 def stat_box(title: str, value: str) -> ft.Container:
     return ft.Container(
@@ -22,15 +23,57 @@ def stat_box(title: str, value: str) -> ft.Container:
     )
 
 
+def load_dashboard_data() -> dict:
+    """Fetch everything the home screen needs. Falls back to defaults if Firebase fails."""
+    data = {
+        "username": None,
+        "distance_km": 0.0,
+        "time_hours": 0.0,
+        "rank": "-",
+        "rank_note": "Log a walk to join the leaderboard!",
+    }
+    try:
+        profile = get_user_profile(USER_ID) or {}
+        data["username"] = profile.get("username")
+        data["distance_km"] = profile.get("total_distance_km", 0.0)
+    except Exception as error:
+        print(f"Could not load profile: {error}")
+
+    try:
+        data["time_hours"] = get_user_totals(USER_ID).get("time_hours", 0.0)
+    except Exception as error:
+        print(f"Could not load activity totals: {error}")
+
+    try:
+        board = get_leaderboard()
+        for i, entry in enumerate(board):
+            if entry["uid"] == USER_ID:
+                data["rank"] = f"#{entry['rank']}"
+                if i == 0:
+                    data["rank_note"] = "You're in the lead!"
+                else:
+                    ahead = board[i - 1]
+                    gap = round(ahead["total_distance_km"] - entry["total_distance_km"], 2)
+                    data["rank_note"] = f"You're {gap} km behind {ahead['username']}!"
+                break
+    except Exception as error:
+        print(f"Could not load leaderboard: {error}")
+
+    return data
+
+
 def home_view(on_record=None) -> ft.Control:
     # Controls are built inside the function so every call gets fresh instances
     # (Flet controls can't safely be shared between rebuilt screens).
+    info = load_dashboard_data()
+    welcome = f"Welcome, {info['username']}!" if info["username"] else "Welcome!"
+
     header = ft.Row(
         controls=[
             ft.Container(
                 padding=ft.Padding.only(top=25),
                 content=ft.Text(
-                    "Welcome!",
+                    welcome,
                     style=ft.TextStyle(
                         size=32,
                         shadow=styles.HEADING_SHADOW,
@@ -47,8 +90,8 @@ def home_view(on_record=None) -> ft.Control:
         spacing=10,
         run_spacing=10,
         controls=[
-            stat_box("Distance:", "3.2 km"),
-            stat_box("Time Spent:", "2.5 hrs"),
+            stat_box("Distance:", f"{info['distance_km']} km"),
+            stat_box("Time Spent:", f"{info['time_hours']} hrs"),
         ],
     )
 
@@ -72,8 +115,8 @@ def home_view(on_record=None) -> ft.Control:
         content=ft.Column(
             [
                 ft.Text("Leaderboard Position:", **styles.BOX_TEXT_STYLE2, size=20, weight=ft.FontWeight.W_600),
-                ft.Text("3rd", **styles.BOX_TEXT_STYLE2, size=32, weight=ft.FontWeight.BOLD),
-                ft.Text("You're x points behind y!", **styles.BOX_TEXT_STYLE2),
+                ft.Text(info["rank"], **styles.BOX_TEXT_STYLE2, size=32, weight=ft.FontWeight.BOLD),
+                ft.Text(info["rank_note"], **styles.BOX_TEXT_STYLE2),
                 leaderboard_button,
             ],
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -91,75 +134,45 @@ def home_view(on_record=None) -> ft.Control:
             ],
         ),
     )
-)
-
-
-def home_view() -> ft.Control:
-    # 1. Fetch Noah's profile and update the Welcome title & Distance box
-    profile = get_user_profile(USER_ID) or {}
-    username = profile.get("username", "User")
-    total_km = profile.get("total_distance_km", 0.0)
-
-    header.controls[0].content.value = f"Welcome, {username}!"
-    two_boxes_layout.controls[0] = stat_box("Distance:", f"{total_km} km")
-
-    # 2. Fetch Noah's live rank and update the Leaderboard Position box
-    for entry in get_leaderboard():
-        if entry["uid"] == USER_ID:
-            leaderboard_box.content.controls[1].value = f"#{entry['rank']}"
-            break
 
     return ft.Column(
         scroll=ft.ScrollMode.HIDDEN,
         alignment=ft.Alignment(0, -1),
         horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
         expand=True,
-        
-        controls = 
-        [
-        ft.SafeArea(
-            content=ft.ResponsiveRow(
-            # spacing=15,
-            # run_spacing=15,
-            width = 100,
-            controls=[
-                header,
-                # HEADER
-                ft.Row(
+        controls=[
+            ft.SafeArea(
+                content=ft.ResponsiveRow(
+                    width=100,
                     controls=[
-                        ft.Container(
-                            content= ft.Text("Explore your dashboard", size = 16,  **styles.HOME_PARAGRAPH_TEXT, ),
+                        header,
+                        ft.Row(
+                            controls=[
+                                ft.Container(
+                                    content=ft.Text(
+                                        "Explore your dashboard", size=16, **styles.HOME_PARAGRAPH_TEXT
+                                    ),
+                                ),
+                            ],
+                            alignment=ft.MainAxisAlignment.CENTER,
                         ),
-                        
+                        ft.Container(
+                            content=ft.Column(
+                                horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
+                                controls=[two_boxes_layout, leaderboard_box],
+                            ),
+                        ),
+                        ft.Container(
+                            content=ft.Column(
+                                horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
+                                controls=[
+                                    ft.Text("Start a new session?", size=16, **styles.HEADING2_TEXT_STYLE),
+                                    record_button,
+                                ],
+                            ),
+                        ),
                     ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                ),  
-                # BOXES COLUMN 
-                ft.Container(
-                    content=ft.Column(
-                        horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
-                        controls=[
-                            # ft.Text("Daily updates:", **styles.HOME_PARAGRAPH_TEXT),
-                            two_boxes_layout,
-                            leaderboard_box, 
-                        ]
-                    ),
                 ),
-                # RIGHT COLUMN 
-                ft.Container(
-                    content= ft.Column(
-                        horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
-                        controls=[ 
-                        ft.Text("Start a new session?", size = 16,  **styles.HEADING2_TEXT_STYLE, ),
-                        record_button, 
-                        ]
-                    )
-                    
-                    
-                ),
-            ],
-        ),
-    ), 
-],
-        
-)
+            ),
+        ],
+    )

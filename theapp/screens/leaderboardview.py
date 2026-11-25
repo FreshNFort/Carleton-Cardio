@@ -76,11 +76,22 @@ def build_rank_row(user: dict):
     )
 
 def leaderboard_view() -> ft.Control:
-    leaderboard = get_leaderboard()
+    try:
+        leaderboard = get_leaderboard()
+    except Exception as error:
+        print(f"Could not load leaderboard: {error}")
+        return ft.Column(
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            controls=[ft.Text("Couldn't load the leaderboard. Check your connection.", color="#551414")],
+        )
 
     weekly_data = []
     for user in leaderboard:
-        weekly_data.append({"rank": user["rank"], "name": user["username"], "points": f"{user["total_distance_km"]} km"})
+        weekly_data.append({"rank": user["rank"], "name": user["username"], "points": f"{user['total_distance_km']} km"})
+
+    # The podium needs three entries; pad with placeholders if there are fewer users
+    while len(weekly_data) < 3:
+        weekly_data.append({"rank": len(weekly_data) + 1, "name": "-", "points": "0 km"})
 
     podium_container = ft.Row(
             alignment = ft.MainAxisAlignment.CENTER,
