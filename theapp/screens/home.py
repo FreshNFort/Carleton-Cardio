@@ -91,36 +91,7 @@ def home_view(on_record=None) -> ft.Control:
         run_spacing=10,
         controls=[
             stat_box("Distance:", f"{info['distance_km']} km"),
-            stat_box("Time Spent:", f"{info['time_hours']} hrs"),
         ],
-    )
-
-    leaderboard_button = ft.Button(
-        style=styles.LEADERBOARD_BUTTON,
-        content=ft.Row(
-            alignment=ft.MainAxisAlignment.CENTER,
-            controls=[
-                ft.Text("View Leaderboard", size=14),
-                ft.Icon(ft.Icons.LEADERBOARD_ROUNDED, color="#FFEAD3"),
-            ],
-        ),
-    )
-
-    leaderboard_box = ft.Container(
-        col={"xs": 12, "md": 12},
-        **styles.BOX_STYLE,
-        height=200,
-        gradient=styles.CARD_GRADIENT2,
-        shadow=styles.CARD_SHADOW,
-        content=ft.Column(
-            [
-                ft.Text("Leaderboard Position:", **styles.BOX_TEXT_STYLE2, size=20, weight=ft.FontWeight.W_600),
-                ft.Text(info["rank"], **styles.BOX_TEXT_STYLE2, size=32, weight=ft.FontWeight.BOLD),
-                ft.Text(info["rank_note"], **styles.BOX_TEXT_STYLE2),
-                leaderboard_button,
-            ],
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        ),
     )
 
     record_button = ft.Button(
@@ -159,7 +130,7 @@ def home_view(on_record=None) -> ft.Control:
                         ft.Container(
                             content=ft.Column(
                                 horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
-                                controls=[two_boxes_layout, leaderboard_box],
+                                controls=[two_boxes_layout],
                             ),
                         ),
                         ft.Container(
