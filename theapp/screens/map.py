@@ -29,6 +29,19 @@ CAMPUS_BOUNDS = fm.MapLatitudeLongitudeBounds(
 )
 CAMPUS_CENTER = fm.MapLatitudeLongitude(latitude=45.3885, longitude=-75.6960)
 
+CAMPUS_BUFFER_M = 300  # forgiveness around the box for GPS error
+
+
+def on_campus(lat: float, lon: float, accuracy_m: float | None = None) -> bool:
+    # Pad the box by a fixed buffer plus the fix's own reported error.
+    pad_m = CAMPUS_BUFFER_M + min(accuracy_m or 0, 100)
+    lat_pad = pad_m / 111_000          # meters per degree of latitude
+    lon_pad = pad_m / 78_000           # meters per degree of longitude at ~45°N
+    return (
+        SOUTH - lat_pad <= lat <= NORTH + lat_pad
+        and WEST - lon_pad <= lon <= EAST + lon_pad
+    )
+
 
 def map_view(
     page: ft.Page, *, include_home: bool = True, start_immediately: bool = False
@@ -157,7 +170,8 @@ def map_view(
                         f"{session.get('date_label', 'Walk')} · "
                         f"{format_distance(float(session.get('distance_m', 0)))}",
                         expand=True,
-                     color=MAROON),
+                        color=MAROON,
+                    ),
                     ft.Text(f"{len(session.get('coordinates', []))} pts", color=MAROON),
                 ]
             )
@@ -256,7 +270,13 @@ def map_view(
             return
 
         try:
-            current_fix = await geolocator.get_current_position()
+            current_fix = await asyncio.wait_for(
+                geolocator.get_current_position(), timeout=15
+            )
+        except asyncio.TimeoutError:
+            status_label.value = "GPS is taking too long. Move outdoors and try again."
+            page.update()
+            return
         except Exception as error:
             log.warning("Could not get a location before starting: %s", error)
             status_label.value = "Could not get your location. Try again outdoors."
@@ -267,8 +287,13 @@ def map_view(
             page.update()
             return
         latitude, longitude = float(current_fix.latitude), float(current_fix.longitude)
-        if not (SOUTH <= latitude <= NORTH and WEST <= longitude <= EAST):
-            message = "Walk sessions can only start on Carleton's main campus."
+        accuracy = float(current_fix.accuracy) if current_fix.accuracy is not None else None
+        log.info("start check: %.6f, %.6f (±%s m)", latitude, longitude, accuracy)
+        if not on_campus(latitude, longitude, accuracy):
+            message = (
+                "Walk sessions can only start on Carleton's main campus. "
+                f"(Your location: {latitude:.4f}, {longitude:.4f})"
+            )
             status_label.value = message
             page.show_dialog(ft.SnackBar(content=ft.Text(message)))
             page.update()
@@ -379,8 +404,10 @@ def map_view(
                 ft.Text("RECENT WALKS", weight=ft.FontWeight.BOLD, color=MAROON),
                 history_column,
                 ft.Text(
-                    "Background GPS may pause when iOS or Android suspends the app.", size=11
-                , color=MAROON),
+                    "Background GPS may pause when iOS or Android suspends the app.",
+                    size=11,
+                    color=MAROON,
+                ),
             ],
         ),
         padding=12,
