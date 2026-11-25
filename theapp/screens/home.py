@@ -9,7 +9,7 @@ USER_ID = "noah fortin"
 
 def stat_box(title: str, value: str) -> ft.Container:
     return ft.Container(
-        col={"xs": 6, "md": 3},
+        col={"xs": 12, "md": 12},
         **styles.BOX_STYLE,
         height=105,
         gradient=styles.CARD_GRADIENT1,
@@ -62,37 +62,64 @@ def load_dashboard_data() -> dict:
     return data
 
 
-def home_view(on_record=None) -> ft.Control:
-    # Controls are built inside the function so every call gets fresh instances
+def home_view(on_record=None, on_leaderboard=None) -> ft.Control:    # Controls are built inside the function so every call gets fresh instances
     # (Flet controls can't safely be shared between rebuilt screens).
     info = load_dashboard_data()
-    welcome = f"Welcome, {info['username']}!" if info["username"] else "Welcome!"
+    welcome = f"Welcome\n{info['username']}!" if info["username"] else "Welcome!"
 
-    header = ft.Row(
-        controls=[
-            ft.Container(
-                padding=ft.Padding.only(top=25),
-                content=ft.Text(
-                    welcome,
-                    style=ft.TextStyle(
-                        size=32,
-                        shadow=styles.HEADING_SHADOW,
-                        font_family="Segoe UI",
-                        **styles.HEADING1_TEXT_STYLE,
-                    ),
-                ),
+    header = ft.Container(
+        padding=ft.Padding.only(top=25),
+        alignment=ft.Alignment(0, 0),
+        content=ft.Text(
+            welcome,
+            text_align=ft.TextAlign.CENTER,
+            style=ft.TextStyle(
+                size=28,
+                shadow=styles.HEADING_SHADOW,
+                font_family="Segoe UI",
+                **styles.HEADING1_TEXT_STYLE,
             ),
-        ],
-        alignment=ft.MainAxisAlignment.CENTER,
+        ),
     )
 
     two_boxes_layout = ft.ResponsiveRow(
         spacing=10,
         run_spacing=10,
+        alignment=ft.MainAxisAlignment.CENTER,
         controls=[
             stat_box("Distance:", f"{info['distance_km']} km"),
         ],
     )
+
+    leaderboard_button = ft.Button(
+        style=styles.LEADERBOARD_BUTTON,
+        on_click=on_leaderboard,
+        content=ft.Row(
+            alignment=ft.MainAxisAlignment.CENTER,
+            controls=[
+                ft.Text("View Leaderboard", size=14),
+                ft.Icon(ft.Icons.LEADERBOARD_ROUNDED, color="#FFEAD3"),
+            ],
+        ),
+    )
+
+    leaderboard_box = ft.Container(
+        col={"xs": 12, "md": 12},
+        **styles.BOX_STYLE,
+        height=200,
+        gradient=styles.CARD_GRADIENT2,
+        shadow=styles.CARD_SHADOW,
+        content=ft.Column(
+            [
+                ft.Text("Leaderboard Position:", **styles.BOX_TEXT_STYLE2, size=20, weight=ft.FontWeight.W_600),
+                ft.Text(info["rank"], **styles.BOX_TEXT_STYLE2, size=32, weight=ft.FontWeight.BOLD),
+                ft.Text(info["rank_note"], **styles.BOX_TEXT_STYLE2),
+                leaderboard_button,
+            ],
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+        ),
+    )
+    
 
     record_button = ft.Button(
         style=styles.RECORD_BUTTON,
@@ -114,7 +141,7 @@ def home_view(on_record=None) -> ft.Control:
         controls=[
             ft.SafeArea(
                 content=ft.ResponsiveRow(
-                    width=100,
+                    #width=100,
                     controls=[
                         header,
                         ft.Row(
@@ -130,7 +157,7 @@ def home_view(on_record=None) -> ft.Control:
                         ft.Container(
                             content=ft.Column(
                                 horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
-                                controls=[two_boxes_layout],
+                                controls=[two_boxes_layout, leaderboard_box],
                             ),
                         ),
                         ft.Container(
