@@ -1,5 +1,3 @@
-"""Live walking map and session controls."""
-
 from __future__ import annotations
 
 import asyncio
@@ -224,15 +222,6 @@ def map_view(
 
     geolocator.on_position_change = on_position_change
 
-    async def request_initial_fix() -> None:
-        try:
-            await process_fix(await geolocator.get_current_position())
-        except Exception as error:
-            log.warning("Initial location request failed: %s", error)
-            if is_recording:
-                status_label.value = f"Location error: {error}"
-                page.update()
-
     async def start_recording() -> None:
         nonlocal active_session, is_recording, locations, raw_samples, filtered_samples
         if is_recording:
@@ -264,6 +253,25 @@ def map_view(
             page.update()
             return
 
+        try:
+            current_fix = await geolocator.get_current_position()
+        except Exception as error:
+            log.warning("Could not get a location before starting: %s", error)
+            status_label.value = "Could not get your location. Try again outdoors."
+            page.update()
+            return
+        if current_fix.latitude is None or current_fix.longitude is None:
+            status_label.value = "Waiting for a GPS fix before starting."
+            page.update()
+            return
+        latitude, longitude = float(current_fix.latitude), float(current_fix.longitude)
+        if not (SOUTH <= latitude <= NORTH and WEST <= longitude <= EAST):
+            message = "Walk sessions can only start on Carleton's main campus."
+            status_label.value = message
+            page.show_dialog(ft.SnackBar(content=ft.Text(message)))
+            page.update()
+            return
+
         raw_samples = filtered_samples = 0
         if active_session is None:
             now = datetime.now(timezone.utc)
@@ -279,7 +287,7 @@ def map_view(
         update_button()
         await save_active_session(prefs, active_session)
         page.update()
-        page.run_task(request_initial_fix)
+        page.run_task(process_fix, current_fix)
 
     async def stop_recording() -> None:
         nonlocal active_session, locations, sessions, is_recording
