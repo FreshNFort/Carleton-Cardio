@@ -5,65 +5,71 @@ from screens.home import home_view
 from screens.map import map_view
 from screens.profile import profile_view
 from screens.stats import stats_view
-from screens.record import record_view
 from screens.leaderboard import leaderboard_view
 
+HOME, MAP, STATS, LEADERBOARD, PROFILE = range(5)  # same order as the navbar destinations
 
-SCREENS = [home_view, map_view, stats_view, leaderboard_view, profile_view, ]  # same order as the navbar destinations
 
 def main(page: ft.Page):
+    page.title = "Carleton Cardio"
+    page.padding = 0
+    page.theme = ft.Theme(color_scheme_seed="red")
+    page.bgcolor = "#F5C3C5"
+    page.on_error = lambda e: print(f"Flet Error: {e.data}")
 
-
-    page.title = "Mobile Preview Simulator"
-
-    # PHONE SIMULATOR COMMANDS
-    page.window.width = 350
+    # Phone simulator window (desktop only)
+    page.window.width = 390
     page.window.height = 744
-
     page.window.min_width = 360
     page.window.max_width = 430
     page.window.min_height = 640
     page.window.max_height = 932
-    page.padding = 0
-   
 
+    body = ft.Container(padding=ft.Padding.symmetric(horizontal=20), expand=True)
+    map_screen = None  # created once so an active recording survives tab switches
 
-    page.title = "Carleton Cardio"
-    page.on_error = lambda e: print(f"Flet Error: {e.data}")
-    page.theme = ft.Theme(color_scheme_seed="red")
-    page.bgcolor = "#F5C3C5"
-    
+    def get_map(start_immediately: bool = False):
+        nonlocal map_screen
+        if map_screen is None:
+            map_screen = map_view(page, include_home=False, start_immediately=start_immediately)
+        return map_screen
 
-    body = ft.Container(content=SCREENS[0](), padding=ft.Padding.symmetric(horizontal=20),)
+    def show(index: int, start_recording: bool = False):
+        if index == HOME:
+            body.content = home_view(on_record=go_record)
+        elif index == MAP:
+            body.content = get_map(start_immediately=start_recording)
+        elif index == STATS:
+            body.content = stats_view()
+        elif index == LEADERBOARD:
+            body.content = leaderboard_view()
+        else:
+            body.content = profile_view()
+        page.update()
+
+    def go_record(e=None):
+        page.navigation_bar.selected_index = MAP
+        show(MAP, start_recording=True)
 
     def on_nav_change(e):
-        body.content = SCREENS[e.control.selected_index]()
-        page.update()
+        show(e.control.selected_index)
 
     page.navigation_bar = ft.NavigationBar(
         label_behavior=ft.NavigationBarLabelBehavior.ONLY_SHOW_SELECTED,
         destinations=[
             ft.NavigationBarDestination(icon=ft.Icons.HOME_OUTLINED, label="Home"),
-            # ft.NavigationBarDestination(icon=ft.Icons.ACCESS_TIME, label="Record"),
             ft.NavigationBarDestination(icon=ft.Icons.MAP_OUTLINED, label="Maps"),
             ft.NavigationBarDestination(icon=ft.Icons.QUERY_STATS, label="Stats"),
             ft.NavigationBarDestination(icon=ft.Icons.LEADERBOARD_OUTLINED, label="Leader\nboard"),
             ft.NavigationBarDestination(icon=ft.Icons.PERSON_OUTLINE_OUTLINED, label="Profile"),
-
         ],
         on_change=on_nav_change,
-        
         bgcolor=styles.NAV_BG_COLOR,
         indicator_color=styles.NAV_INDICATOR_COLOR,
-        
-
     )
 
-    page.add(ft.SafeArea(body, expand=True,))
-    page.update()
-
-
+    body.content = home_view(on_record=go_record)
+    page.add(ft.SafeArea(body, expand=True))
 
 
 ft.run(main)
-
